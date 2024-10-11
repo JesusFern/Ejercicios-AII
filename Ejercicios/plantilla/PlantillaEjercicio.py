@@ -30,6 +30,9 @@ def cargar():
 def ventana_principal():
         
     root = Tk()
+    
+    #Crear aqui configuración de menú / botones según pida el ejercicio
+    
     root.mainloop()
     
 #ventana_principal()

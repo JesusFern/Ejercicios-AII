@@ -1,0 +1,15 @@
+Reparto trabajo practica 
+
+BLOQUE 1
+
+Almacenamiento de datos ---- 
+Dos personas, se reparten a la mitad los atributos a scrappear
+------------
+Tkinter ----
+Empezar a crear botones / menús para la ventana principal de Tkinter
+
+
+BLOQUE 2
+
+Se reparten los ejercicios una vez los datos están cargados,
+usualmente será un listado y luego varios filtros de búsqueda.

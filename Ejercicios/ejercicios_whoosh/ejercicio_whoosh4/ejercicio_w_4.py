@@ -54,7 +54,7 @@ def extraer_recetas():
         introduccion = s1.find("div", class_="intro").text
         caracteristicas = s1.find("div", class_="properties inline")
         if caracteristicas:
-            caracteristicas = caracteristicas.text.replace("CaracterÃ­sticas adicionales:","")
+            caracteristicas = caracteristicas.text.replace("Características adicionales:","")
             caracteristicas = ",".join([c.strip() for c in caracteristicas.split(",")] )     
         else:
             caracteristicas = "sin definir"
@@ -161,26 +161,39 @@ def buscar_fecha():
             rango_fecha = f"[{fecha_inicio} TO {fecha_fin}]"
             query = QueryParser("fecha", ix.schema).parse(rango_fecha)
             results = searcher.search(query,limit=None) #devuelve todos los resultados
-            v = Toplevel()
-            v.title("Listado de PelÃ­culas")
-            v.geometry('800x150')
-            sc = Scrollbar(v)
-            sc.pack(side=RIGHT, fill=Y)
-            lb = Listbox(v, yscrollcommand=sc.set)
-            lb.pack(side=BOTTOM, fill = BOTH)
-            sc.config(command = lb.yview)
-            for r in results:
-                lb.insert(END,r['titulo'])
-                lb.insert(END,r['fecha'])
-                lb.insert(END,'')
+            listar(results)
     
     v = Toplevel()
     v.title("Busqueda por Fecha")
-    l = Label(v, text="Introduzca rango de fechas AAAAMMDD AAAAMMDD:")
+    l = Label(v, text="Introduzca rango de fechas DD/MM/AAAA DD/MM/AAAA:")
     l.pack(side=LEFT)
     en = Entry(v)
     en.bind("<Return>", mostrar_lista)
     en.pack(side=LEFT)
+
+def buscar_caracteristicas_titulo():
+    def mostrar_lista():    
+        with ix.searcher() as searcher:
+            entrada = '"'+str(sp.get())+'"' #se ponen comillas porque hay categorÃ­as con mÃ¡s de una palabra
+            query = QueryParser("caracteristicas", ix.schema).parse(entrada) & QueryParser("titulo", ix.schema).parse(en.get())
+            results = searcher.search(query,limit=10)
+            listar(results)
+    v = Toplevel()
+    v.title("Busqueda por Caracteristicas y titulo")
+    l = Label(v, text="Seleccione tematica y titulo a buscar:")
+    l.pack(side=LEFT)
+    
+    ix=open_dir("Index")      
+    with ix.searcher() as searcher:
+        #lista de todas las temÃ¡ticas disponibles en el campo de temÃ¡ticas
+        lista_caracteristicas = [i.decode('utf-8') for i in searcher.lexicon('caracteristicas')]
+    
+    sp = Spinbox(v, values=lista_caracteristicas, state="readonly")
+    sp.pack(side=LEFT)
+    en = Entry(v)
+    en.pack(side=LEFT)
+    boton_buscar = Button(v, text="Buscar", command=mostrar_lista)
+    boton_buscar.pack(side=LEFT)
 
 
 def ventana_principal():
@@ -204,8 +217,7 @@ def ventana_principal():
     buscarmenu = Menu(menubar, tearoff=0)
     buscarmenu.add_command(label="Titulo o Introduccion", command=buscar_titulo_introduccion)
     buscarmenu.add_command(label="Fecha", command=buscar_fecha)
-    # buscarmenu.add_command(label="GÃ©neros", command=buscar_generos)
-    # buscarmenu.add_command(label="Modificar Fecha", command=modificar_fecha)
+    buscarmenu.add_command(label="Características y Título", command=buscar_caracteristicas_titulo)
     
     menubar.add_cascade(label="Buscar", menu=buscarmenu)
     
